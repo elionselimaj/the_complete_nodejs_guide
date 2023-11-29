@@ -14,8 +14,11 @@ app.use(bodyParser.urlencoded({extended: false})); // it registers a middleware
 app.use(adminRoutes);
 app.use(shopRoutes);
 
+app.use((req, res, next) => {
+    res.status(404).send('<h1>Page not found</h1>')
+}); // handling 404
 
-//app is created once
+//server is created once
 const server = http.createServer(app); // creates a server
 
 // in production, it takes default port of the app :80
