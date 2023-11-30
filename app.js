@@ -1,25 +1,25 @@
-// creating a app for nodejs
+const path = require('path');
 
-const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const adminRoutes = require('./src/routes/admin');
-const shopRoutes = require('./src/routes/shop');
+const errorController = require('./controllers/error');
+const db = require('./util/database');
 
-// this is to create function from express which handles a lot of login
 const app = express();
-app.use(bodyParser.urlencoded({extended: false})); // it registers a middleware
 
-app.use(adminRoutes);
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
-app.use((req, res, next) => {
-    res.status(404).send('<h1>Page not found</h1>')
-}); // handling 404
+app.use(errorController.get404);
 
-//server is created once
-const server = http.createServer(app); // creates a server
-
-// in production, it takes default port of the app :80
-server.listen(3000);
+app.listen(3000);
