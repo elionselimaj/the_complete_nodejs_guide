@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const errorController = require('./controllers/error');
 // const mongoConnect = require('./util/database').mongoConnect;
-// const User = require('./models/user');
+const User = require('./models/user');
 
 const app = express();
 
@@ -19,6 +19,15 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+  User.findById('6571ece034470d562d8c8de6')
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
@@ -26,5 +35,17 @@ app.use(errorController.get404);
 
 mongoose.connect('mongodb+srv://albmotors:zF9mE9D7xYEfnFhP@cluster0.q2dirsh.mongodb.net/?retryWrites=true&w=majority').then(() => {
     console.log('Connected::')
+    User.findOne().then(user => {
+        if (!user) {
+            const user = new User({
+                name: 'Elion',
+                email: 'elionselimaj@gmail.com',
+                cart: {
+                    items: []
+                }
+            });
+            user.save();
+        }
+    })
     app.listen(3000);
 }).catch(error => console.log('Connection failed::', error));
