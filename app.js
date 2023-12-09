@@ -41,7 +41,10 @@ app.use(csrfProtection);
 app.use(flash())
 
 app.use((req, res, next) => {
-  User.findById('6571ece034470d562d8c8de6')
+    if (!req.session.user) {
+        return next();
+    }
+  User.findById(req.session.user._id)
     .then(user => {
       req.user = user;
       next();
